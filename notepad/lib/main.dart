@@ -1,15 +1,46 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad/add_notes.dart';
 import 'package:notepad/database/database_handler.dart';
+import 'package:notepad/model/note_model.dart';
+import 'package:notepad/show_notes.dart';
 
-void main() => runApp(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: "/",
-      routes: {
-        "/AddNotes": (context) => AddNotes(),
-      },
-      home: HomeScreen(),
-    ));
+themeDecision(x) {
+  if (x == 0) {
+    return CupertinoThemeData(
+      barBackgroundColor: CupertinoColors.black,
+      primaryColor: CupertinoColors.white,
+      brightness: Brightness.dark,
+      textTheme: CupertinoTextThemeData(
+        primaryColor: CupertinoColors.white,
+      ),
+      scaffoldBackgroundColor: CupertinoColors.darkBackgroundGray,
+    );
+  } else if (x == 1) {
+    return CupertinoThemeData(
+        barBackgroundColor: CupertinoColors.white,
+        primaryColor: CupertinoColors.black,
+        brightness: Brightness.light,
+        textTheme: CupertinoTextThemeData(
+          primaryColor: CupertinoColors.black,
+        ),
+        scaffoldBackgroundColor: CupertinoColors.extraLightBackgroundGray);
+  }
+}
+
+int x = 0;
+void main() {
+  runApp(CupertinoApp(
+    theme: x == 0 ? themeDecision(0) : themeDecision(1),
+    debugShowCheckedModeBanner: false,
+    initialRoute: "/",
+    routes: {
+      "/AddNotes": (context) => AddNotes(),
+      "/ShowNotes": (context) => ShowNotes(),
+    },
+    home: HomeScreen(),
+  ));
+}
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -23,7 +54,6 @@ class HomeScreen extends StatelessWidget {
 class BodyListShows extends StatefulWidget {
   const BodyListShows({Key? key}) : super(key: key);
 
-  @override._BodyListShowsState
   createState() => _BodyListShowsState();
 }
 
@@ -36,39 +66,24 @@ class _BodyListShowsState extends State<BodyListShows> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80.0),
-          child: AppBar(
-            titleSpacing: 0,
-            elevation: 0.5,
-            backgroundColor: Colors.white,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.grey[300],
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-            ],
-            title: Text(
-              "MyNotes",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                  wordSpacing: 0.2),
-            ),
+        appBar: CupertinoNavigationBar(
+          leading: CupertinoButton(
+            onPressed: () {
+              if (x == 0) {}
+            },
+            child: Icon(CupertinoIcons.lightbulb),
+          ),
+          backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
+          middle: Text(
+            "Notes",
+            style: TextStyle(
+                color: CupertinoTheme.of(context).primaryColor,
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+                wordSpacing: 0.2),
           ),
         ),
         body: FutureBuilder(
@@ -102,33 +117,36 @@ class _BodyListShowsState extends State<BodyListShows> {
                             itemBuilder: (context, index) {
                               String title = noteData.data[index]['title'];
                               String body = noteData.data[index]['body'];
+                              String creationDate =
+                                  noteData.data[index]['creation_date'];
                               int id = noteData.data[index]['id'];
-                              bool isEnabled = false;
                               return GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.pushNamed(context, "/ShowNotes",
+                                      arguments: NoteModel(
+                                          title: title,
+                                          body: body,
+                                          creation_date:
+                                              creationDate.toString()));
+                                },
                                 child: Card(
-                                  elevation: 0.5,
+                                  elevation: 1,
                                   child: ListTile(
-                                    trailing: IconButton(
-                                        onPressed: () {
-                                          isEnabled = true;
-                                        },
-                                        icon: isEnabled
-                                            ? Icon(Icons.star)
-                                            : Icon(Icons.star,
-                                                color: Colors.yellow[900])),
                                     title: Text(
                                       title,
                                       style: TextStyle(
                                           fontSize: 22,
-                                          color: Colors.blueGrey[900],
+                                          color: CupertinoTheme.of(context)
+                                              .primaryColor,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 0.01),
                                     ),
                                     subtitle: Text(
                                       body,
                                       style: TextStyle(
-                                          fontSize: 10, color: Colors.black54),
+                                          fontSize: 10,
+                                          color: CupertinoTheme.of(context)
+                                              .primaryColor),
                                     ),
                                   ),
                                 ),
@@ -140,11 +158,10 @@ class _BodyListShowsState extends State<BodyListShows> {
               }
             }),
         floatingActionButton: FloatingActionButton(
+            backgroundColor: CupertinoColors.inactiveGray,
             onPressed: () {
-              Navigator.pushNamed((context), "/AddNotes");
+              Navigator.pushNamed(context, "/AddNotes");
             },
-            child: Icon(
-              Icons.add,
-            )));
+            child: Icon(CupertinoIcons.add, color: CupertinoColors.black)));
   }
 }

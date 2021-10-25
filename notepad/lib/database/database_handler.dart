@@ -35,9 +35,10 @@ class DatabaseHandler {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<int> deleteNote(int id) async {
+  Future<int> deleteNote(String title) async {
     final db = await database;
-    int count = await db!.rawDelete("DELETE FROM notes where id = ?", [id]);
+    int count =
+        await db!.rawDelete("DELETE FROM notes where title = ?", [title]);
     return count;
   }
 

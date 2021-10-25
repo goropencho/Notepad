@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:notepad/database/database_handler.dart';
 import 'package:notepad/model/note_model.dart';
 
 class AddNotes extends StatefulWidget {
-  const AddNotes({Key? key}) : super(key: key);
+  AddNotes({Key? key}) : super(key: key);
 
   @override
   _AddNotesState createState() => _AddNotesState();
@@ -12,7 +13,8 @@ class AddNotes extends StatefulWidget {
 class _AddNotesState extends State<AddNotes> {
   late String title;
   late String body;
-  late DateTime creation_date;
+  // ignore: non_constant_identifier_names
+  late String creation_date;
   late bool starred;
   TextEditingController titleController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
@@ -25,19 +27,19 @@ class _AddNotesState extends State<AddNotes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(80),
-          child: AppBar(
-            elevation: 0.0,
-            backgroundColor: Colors.white,
+          child: CupertinoNavigationBar(
+            backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.grey[300],
+                backgroundColor: CupertinoColors.inactiveGray,
                 child: IconButton(
                   icon: Icon(
-                    Icons.arrow_back_ios,
+                    CupertinoIcons.backward,
                     color: Colors.black,
                   ),
                   onPressed: () {
@@ -52,33 +54,30 @@ class _AddNotesState extends State<AddNotes> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              TextField(
+              CupertinoTextField(
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.sentences,
                 controller: titleController,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Title",
-                ),
-                style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold),
+                placeholder: "Title",
+                style: TextStyle(fontSize: 35.0, fontWeight: FontWeight.bold),
               ),
-              Expanded(
-                  child: TextField(
+              CupertinoTextField(
                 controller: bodyController,
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
-                style: TextStyle(fontSize: 20.0),
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Write here..........."),
-              )),
+                style: TextStyle(fontSize: 22.0),
+                placeholder: "Body",
+              ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: Theme.of(context).buttonColor,
           onPressed: () {
             setState(() {
               title = titleController.text;
               body = bodyController.text;
-              creation_date = DateTime.now();
+              creation_date = DateTime.now().toString();
             });
             NoteModel note = NoteModel(
               title: title,
@@ -89,7 +88,7 @@ class _AddNotesState extends State<AddNotes> {
             Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
           },
           label: Text("Save"),
-          icon: Icon(Icons.save),
+          icon: Icon(CupertinoIcons.hand_thumbsup),
         ));
   }
 }
